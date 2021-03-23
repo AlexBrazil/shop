@@ -95,11 +95,21 @@ class Products with ChangeNotifier {
     }
   }
 
-  void deleteProduct(String id) {
+  Future<void> deleteProduct(String id) async {
     final index = _items.indexWhere((itemProduto) => itemProduto.id == id);
     if (index >= 0) {
-      _items.removeWhere((itemProduct) => itemProduct.id == id);
+      final product = _items[index];
+      final response = await http.delete("$_baseUrl/${product.id}.json");
+
+      _items.remove(product);
       notifyListeners();
+      // a faixa dos 400 é erro do lado do frontend e na faixa dos 500 é no backend
+      // Já a faixa dos 200 é status bem sucedido
+      if (response.statusCode >= 400) {
+        // Caso o http retorno um erro o produto é reincerido
+        _items.insert(index, product);
+        notifyListeners();
+      } else {}
     }
   }
 
