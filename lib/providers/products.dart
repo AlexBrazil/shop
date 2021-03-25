@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:shop/exceptions/http_exception.dart';
 import 'product.dart';
 
 // ChangeNotifier - quando o evento de mudança acontece ele irá notificar
@@ -103,13 +104,22 @@ class Products with ChangeNotifier {
 
       _items.remove(product);
       notifyListeners();
+
       // a faixa dos 400 é erro do lado do frontend e na faixa dos 500 é no backend
       // Já a faixa dos 200 é status bem sucedido
       if (response.statusCode >= 400) {
         // Caso o http retorno um erro o produto é reincerido
         _items.insert(index, product);
         notifyListeners();
-      } else {}
+        /* Vamos lançar uma exceção
+        Conseguiremos lançaresta exceção porque criamos uma classe HttpException
+        que implementa Exception
+
+        Esta Exceção precisa ser tratada em algum ponto do código
+
+        */
+        throw HttpException('Ocorreu um erro na exclusão do produto');
+      }
     }
   }
 

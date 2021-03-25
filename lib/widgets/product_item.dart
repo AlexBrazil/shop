@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shop/exceptions/http_exception.dart';
 import 'package:shop/providers/products.dart';
 import '../providers/product.dart';
 import '../utils/app_routes.dart';
@@ -10,6 +11,10 @@ class ProductItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    /* Usamos o scaffold em uma variável para ter acesso em um método Async,
+     pois métodos Async não tem acesso a árvore de componentes
+    */
+    final scaffold = Scaffold.of(context);
     return ListTile(
       leading: CircleAvatar(
         backgroundImage: NetworkImage(product.imageUrl),
@@ -59,13 +64,23 @@ class ProductItem extends StatelessWidget {
                       )
                     ],
                   ),
-                  // Aguarda um retorno futuro quando a janela for fechada
-                ).then((value) {
+                  /* Aguarda um retorno futuro quando a janela for fechada
+                  Tornamos o método THEN como ASYNC para poder usar Await
+                  */
+                ).then((value) async {
                   if (value == true) {
                     // listen é false porque o que tem que ser atualizado não é
                     // o widget product_item, pois ele será deletado
-                    Provider.of<Products>(context, listen: false)
-                        .deleteProduct(product.id);
+                    try {
+                      await Provider.of<Products>(context, listen: false)
+                          .deleteProduct(product.id);
+                    } on HttpException catch (error) {
+                      // Para acessar o Scaffold aqui estamos usando uma variável
+                      // Veja acima
+                      scaffold.showSnackBar(
+                        SnackBar(content: Text(error.toString())),
+                      );
+                    }
                   }
                 });
               },
