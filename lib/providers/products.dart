@@ -89,6 +89,7 @@ class Products with ChangeNotifier {
           'description': product.description,
           'price': product.price,
           'imageUrl': product.imageUrl,
+          'isFavorite': product.isFavorite,
         }),
       );
       _items[index] = product;
@@ -112,7 +113,7 @@ class Products with ChangeNotifier {
         _items.insert(index, product);
         notifyListeners();
         /* Vamos lançar uma exceção
-        Conseguiremos lançaresta exceção porque criamos uma classe HttpException
+        Conseguiremos lançar esta exceção porque criamos uma classe HttpException
         que implementa Exception
 
         Esta Exceção precisa ser tratada em algum ponto do código
@@ -149,5 +150,40 @@ class Products with ChangeNotifier {
 
     // Como não existe um return, temos que inserir
     return Future.value(); // Retorna um valor vazio
+  }
+
+  Future<void> changeToggleFavorite(Product product) async {
+    if (product == null || product.id == null) {
+      return Future.value();
+    }
+    /* Percisamos achar o indice do produto para ser alterado o isFavorite
+    Se o ID do produto passado for achado dentro de _items é retornado
+    o índide (int), caso contrário retorna -1
+    */
+    final index =
+        _items.indexWhere((itemProduto) => itemProduto.id == product.id);
+
+    if (index >= 0) {
+      product.isFavorite = !product.isFavorite;
+      _items[index].isFavorite = product.isFavorite;
+      notifyListeners();
+
+      final response = await http.patch(
+        "$_baseUrl/${product.id}",
+        body: json.encode({
+          'isFavorite': product.isFavorite,
+        }),
+      );
+
+      if (response.statusCode >= 400) {
+        // Caso o http retorno um erro o isFavorite é restaurado para o valor anterior
+        product.isFavorite = !product.isFavorite;
+        _items[index].isFavorite = product.isFavorite;
+        notifyListeners();
+        // Lançada uma exceção
+        throw HttpException(
+            'Ocorreu um erro na opção de favoritar ou desfavoritar');
+      }
+    }
   }
 }

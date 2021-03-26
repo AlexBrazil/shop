@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shop/providers/products.dart';
 import '../providers/product.dart';
 import '../providers/cart.dart';
 import '../utils/app_routes.dart';
@@ -13,6 +14,7 @@ class ProductGridItem extends StatelessWidget {
     // Usaremos aqui o 'listem false' por a UI não irá se alterar, apenas temos que
     // acionar algum método ao clicar no botão do carrinho
     final Cart cart = Provider.of<Cart>(context, listen: false);
+    final products = Provider.of<Products>(context);
 
     return ClipRRect(
       // Para definir uma borda arredondada
@@ -41,7 +43,7 @@ class ProductGridItem extends StatelessWidget {
               icon: Icon(
                   product.isFavorite ? Icons.favorite : Icons.favorite_border),
               onPressed: () {
-                product.toggleFavorite();
+                products.changeToggleFavorite(product);
               },
               color: Theme.of(context).accentColor,
             ),
