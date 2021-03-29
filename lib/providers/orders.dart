@@ -1,6 +1,6 @@
-import 'dart:math';
-
+import 'dart:convert';
 import 'package:flutter/cupertino.dart';
+import 'package:http/http.dart' as http;
 import 'package:shop/providers/cart.dart';
 
 class Order {
@@ -25,11 +25,35 @@ class Orders with ChangeNotifier {
     return [..._items];
   }
 
+  final String _baseUrl =
+      // Se quisermos simular um erro no Firebase retiramos .json
+      'https://flutter-cod3r-10ba2-default-rtdb.firebaseio.com/orders';
+
   int get itemsCount {
     return _items.length;
   }
 
-  void addOrder(Cart cart) {
+  Future<void> addOrder(Cart cart) async {
+    final date = DateTime.now();
+    final response = await http.post(
+      "$_baseUrl.json",
+      body: json.encode({
+        'total': cart.totalAmount,
+        // Convert no formato ISO-8601 para armazenamento
+        'date': date.toIso8601String(),
+        // Produtos é uma List de itens e preisa ser convertido em um Map
+        'products': cart.items.values
+            .map((cartItem) => {
+                  'id': cartItem.id,
+                  'productId': cartItem.productId,
+                  'title': cartItem.title,
+                  'quantity': cartItem.quantity,
+                  'price': cartItem.price,
+                })
+            .toList(),
+      }),
+    );
+
     /* Poderiamos calcular o total aqui
     void addOrder(List<CartItem> products, double total) {
       final combine = (acumulador, element) =>
@@ -40,9 +64,11 @@ class Orders with ChangeNotifier {
     _items.insert(
       0,
       Order(
-        id: Random().nextDouble().toString(),
+        // No body recebemos um MAP "Chave" : Valor, sendo que a chave é um
+        // string 'name' e valor é outro MAP com o conteúdo
+        id: json.decode(response.body)['name'],
         total: cart.totalAmount,
-        date: DateTime.now(),
+        date: date,
         products: cart.items.values.toList(),
       ),
     );
