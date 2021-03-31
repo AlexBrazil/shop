@@ -4,28 +4,10 @@ import '../widgets/app_drawer.dart';
 import '../widgets/order_widget.dart';
 import '../providers/orders.dart';
 
-class OrderScreen extends StatefulWidget {
-  @override
-  _OrderScreenState createState() => _OrderScreenState();
-}
-
-class _OrderScreenState extends State<OrderScreen> {
-  bool isLoading = true;
-
+class OrderScreen extends StatelessWidget {
   Future<void> _refreshOrders(BuildContext context) {
     return Provider.of<Orders>(context, listen: false).loadOrders();
   }
-
-  /*@override
-  void initState() {
-    super.initState();
-    Provider.of<Orders>(context, listen: false).loadOrders().then((_) {
-      setState(() {
-        isLoading = false;
-      });
-    });
-  }
-  */
 
   @override
   Widget build(BuildContext context) {
