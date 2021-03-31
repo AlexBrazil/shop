@@ -16,7 +16,7 @@ class _OrderScreenState extends State<OrderScreen> {
     return Provider.of<Orders>(context, listen: false).loadOrders();
   }
 
-  @override
+  /*@override
   void initState() {
     super.initState();
     Provider.of<Orders>(context, listen: false).loadOrders().then((_) {
@@ -25,16 +25,46 @@ class _OrderScreenState extends State<OrderScreen> {
       });
     });
   }
+  */
 
   @override
   Widget build(BuildContext context) {
+    /*
+    Não estamos usando o Provider aqui pois estamos usando pontualmente
+    um Consumer<Orders>
+
     final Orders orders = Provider.of(context);
+    */
     return Scaffold(
-      appBar: AppBar(
-        title: Text('MEUS PEDIDOS'),
-      ),
-      drawer: AppDrawer(),
-      body: isLoading
+        appBar: AppBar(
+          title: Text('MEUS PEDIDOS'),
+        ),
+        drawer: AppDrawer(),
+        body: FutureBuilder(
+          future: Provider.of<Orders>(context, listen: false).loadOrders(),
+          builder: (ctx, snapshot) {
+            // Enquanto future não receber o retorno, snapshot.connectionState
+            // estará no estado de waiting
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(child: CircularProgressIndicator());
+            } else {
+              // RefreshIndicator atualiza a tela caso arrastada para baixo
+              return RefreshIndicator(
+                onRefresh: () => _refreshOrders(context),
+                // Consumer é uma forma de Provider que atua de forma pontual
+                child: Consumer<Orders>(
+                  builder: (ctx, orders, child) {
+                    return ListView.builder(
+                      itemCount: orders.itemsCount,
+                      itemBuilder: (ctx, i) => OrderWidget(orders.items[i]),
+                    );
+                  },
+                ),
+              );
+            }
+          },
+        )
+        /*isLoading
           ? Center(
               child: CircularProgressIndicator(),
             )
@@ -44,7 +74,7 @@ class _OrderScreenState extends State<OrderScreen> {
                 itemCount: orders.itemsCount,
                 itemBuilder: (ctx, i) => OrderWidget(orders.items[i]),
               ),
-            ),
-    );
+            ),*/
+        );
   }
 }
