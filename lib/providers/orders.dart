@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:shop/providers/cart.dart';
+import 'package:shop/utils/constants.dart';
 
 class Order {
   final String id;
@@ -27,7 +28,7 @@ class Orders with ChangeNotifier {
 
   final String _baseUrl =
       // Se quisermos simular um erro no Firebase retiramos .json
-      'https://flutter-cod3r-10ba2-default-rtdb.firebaseio.com/orders';
+      '${Constants.BASE_API_URL}/orders';
 
   int get itemsCount {
     return _items.length;
