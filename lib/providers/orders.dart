@@ -74,4 +74,42 @@ class Orders with ChangeNotifier {
     );
     notifyListeners();
   }
+
+  Future<void> loadOrders() async {
+    List<Order> loadedItems = [];
+    // Se não usarmos await response NÃO recebe a resposta, mas sim um FUTURE, e
+    // com isso NÃO teremos acesso ao .body
+    final reponse = await http.get("$_baseUrl.json");
+    Map<String, dynamic> data = json.decode(reponse.body);
+    //Limpa o MAP
+
+    if (data != null) {
+      data.forEach((orderID, orderData) {
+        loadedItems.add(
+          Order(
+            id: orderID,
+            total: orderData['total'],
+            date: DateTime.parse(orderData['date']),
+            // products é uma LIST de MAP's
+            products: (orderData['products'] as List<dynamic>).map((item) {
+              return CartItem(
+                id: item['id'],
+                productId: item['productID'],
+                title: item['title'],
+                quantity: item['quantity'],
+                price: item['price'],
+              );
+            }).toList(),
+          ),
+        );
+      });
+      notifyListeners();
+    }
+
+    // Muda a ordem da lista
+    _items = loadedItems.reversed.toList();
+
+    // Como não existe um return, temos que inserir
+    return Future.value(); // Retorna um valor vazio
+  }
 }
