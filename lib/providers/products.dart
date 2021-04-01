@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shop/exceptions/http_exception.dart';
+import 'package:shop/utils/constants.dart';
 import 'product.dart';
 
 // ChangeNotifier - quando o evento de mudança acontece ele irá notificar
@@ -16,7 +17,7 @@ class Products with ChangeNotifier {
     */
   final String _baseUrl =
       // Se quisermos simular um erro no Firebase retiramos .json
-      'https://flutter-cod3r-10ba2-default-rtdb.firebaseio.com/products';
+      '${Constants.BASE_API_URL}/products';
 
   /* Getters retorna uma cópia da lista de produtos, pois se passarmos uma
    referência de _item, qualquer um terá a possibilidade de alterar a
