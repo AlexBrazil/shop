@@ -8,6 +8,7 @@ import './views/products_screen.dart';
 import './views/cart_secreen.dart';
 import './views/order_secreen.dart';
 import './views/product_form_screen.dart';
+import './views/auth_screen.dart';
 import './providers/products.dart';
 import './providers/orders.dart';
 
@@ -46,6 +47,7 @@ class MyApp extends StatelessWidget {
         //home: ProductsOverviewScreen(), - estamos suando a tota abaixo
         routes: {
           AppRoutes.HOME: (ctx) => ProductsOverviewScreen(),
+          AppRoutes.AUTH: (ctx) => AuthScreen(),
           AppRoutes.ORDERS: (ctx) => OrderScreen(),
           AppRoutes.PRODUCTS: (ctx) => ProductsScreen(),
           AppRoutes.PRODUCT_DETAIL: (ctx) => ProductDetailScreen(),
