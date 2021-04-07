@@ -1,3 +1,7 @@
+/*
+AJUDA NO FIREBASE
+https://firebase.google.com/docs/reference/rest/auth#section-sign-in-email-password
+*/
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shop/providers/auth.dart';
@@ -37,7 +41,7 @@ class _AuthCardState extends State<AuthCard> {
     Auth auth = Provider.of(context, listen: false);
 
     if (_authMode == AuthMode.Login) {
-      // Login
+      await auth.login(_authData['email'], _authData['password']);
     } else {
       await auth.signup(_authData['email'], _authData['password']);
     }
