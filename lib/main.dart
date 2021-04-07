@@ -11,6 +11,7 @@ import './views/product_form_screen.dart';
 import './views/auth_screen.dart';
 import './providers/products.dart';
 import './providers/orders.dart';
+import './providers/auth.dart';
 
 void main() => runApp(MyApp());
 
@@ -34,6 +35,11 @@ class MyApp extends StatelessWidget {
           // Orders() deve ter um mixin de ChangeNotifier
           // Criando o ChangeNotifierProvider
           create: (ctx) => new Orders(),
+        ),
+        ChangeNotifierProvider(
+          // Auth() deve ter um mixin de ChangeNotifier
+          // Criando o ChangeNotifierProvider
+          create: (ctx) => new Auth(),
         )
       ],
       child: MaterialApp(
