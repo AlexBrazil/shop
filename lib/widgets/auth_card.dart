@@ -24,6 +24,9 @@ class _AuthCardState extends State<AuthCard> {
   AuthMode _authMode = AuthMode.Login;
   bool _isLoading = false;
 
+  // Variável usada para mostrar ou ocultar os caracteres da senha
+  bool _isObscure = true;
+
   Future<void> _submit() async {
     // Se o formulário estiver com algum erro nos dados preenchidos
     if (!_form.currentState.validate()) {
@@ -41,9 +44,15 @@ class _AuthCardState extends State<AuthCard> {
     Auth auth = Provider.of(context, listen: false);
 
     if (_authMode == AuthMode.Login) {
-      await auth.login(_authData['email'], _authData['password']);
+      await auth.login(
+        _authData['email'],
+        _authData['password'],
+      );
     } else {
-      await auth.signup(_authData['email'], _authData['password']);
+      await auth.signup(
+        _authData['email'],
+        _authData['password'],
+      );
     }
 
     setState(() {
@@ -67,6 +76,23 @@ class _AuthCardState extends State<AuthCard> {
     });
   }
 
+  /// Check if a String is a valid email.
+  /// Return true if it is valid.
+  bool isEmailValid(String email) {
+    // Null or empty string is invalid
+    if (email == null || email.isEmpty) {
+      return false;
+    }
+
+    const pattern = r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$';
+    final regExp = RegExp(pattern);
+
+    if (!regExp.hasMatch(email)) {
+      return false;
+    }
+    return true;
+  }
+
   @override
   Widget build(BuildContext context) {
     final deviceSize = MediaQuery.of(context).size;
@@ -86,7 +112,8 @@ class _AuthCardState extends State<AuthCard> {
                 decoration: InputDecoration(labelText: 'E-mail'),
                 keyboardType: TextInputType.emailAddress,
                 validator: (value) {
-                  if (value.isEmpty || !value.contains('@')) {
+                  //if (value.isEmpty || !value.contains('@')) {
+                  if (!isEmailValid(value)) {
                     return 'Informe um e-mail válido';
                   }
                   return null;
@@ -95,8 +122,20 @@ class _AuthCardState extends State<AuthCard> {
               ),
               TextFormField(
                 controller: _passwordController,
-                decoration: InputDecoration(labelText: 'Senha'),
-                obscureText: true,
+                decoration: InputDecoration(
+                  labelText: 'Senha',
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _isObscure ? Icons.visibility : Icons.visibility_off,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _isObscure = !_isObscure;
+                      });
+                    },
+                  ),
+                ),
+                obscureText: _isObscure,
                 validator: (value) {
                   if (value.isEmpty || value.length < 5) {
                     return 'Informe uma senha com no mínimo 5 caracteres';
@@ -108,8 +147,10 @@ class _AuthCardState extends State<AuthCard> {
               if (_authMode == AuthMode.Signup)
                 TextFormField(
                   //controller: _passwordController,
-                  decoration: InputDecoration(labelText: 'Confirmar Senha'),
-                  obscureText: true,
+                  decoration: InputDecoration(
+                    labelText: 'Confirmar Senha',
+                  ),
+                  obscureText: _isObscure,
                   validator: _authMode == AuthMode.Signup
                       ? (value) {
                           if (value != _passwordController.text) {
