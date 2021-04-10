@@ -4,6 +4,7 @@ https://firebase.google.com/docs/reference/rest/auth#section-sign-in-email-passw
 */
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shop/exceptions/auth_exception.dart';
 import 'package:shop/providers/auth.dart';
 
 enum AuthMode { Signup, Login }
@@ -27,6 +28,23 @@ class _AuthCardState extends State<AuthCard> {
   // Variável usada para mostrar ou ocultar os caracteres da senha
   bool _isObscure = true;
 
+  void _showErrorDialog(String msg) {
+    showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+              title: Text("Ocorreu um erro!"),
+              content: Text(msg),
+              actions: [
+                FlatButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text("Fechar"),
+                )
+              ],
+            ));
+  }
+
   Future<void> _submit() async {
     // Se o formulário estiver com algum erro nos dados preenchidos
     if (!_form.currentState.validate()) {
@@ -43,16 +61,23 @@ class _AuthCardState extends State<AuthCard> {
     // Provider para autenticação
     Auth auth = Provider.of(context, listen: false);
 
-    if (_authMode == AuthMode.Login) {
-      await auth.login(
-        _authData['email'],
-        _authData['password'],
-      );
-    } else {
-      await auth.signup(
-        _authData['email'],
-        _authData['password'],
-      );
+    try {
+      if (_authMode == AuthMode.Login) {
+        await auth.login(
+          _authData['email'],
+          _authData['password'],
+        );
+      } else {
+        await auth.signup(
+          _authData['email'],
+          _authData['password'],
+        );
+      }
+    } on AuthException catch (error) {
+      _showErrorDialog(error.toString());
+    } catch (error) {
+      // Um erro genérico
+      _showErrorDialog("Ocorreu um erro inesperado");
     }
 
     setState(() {

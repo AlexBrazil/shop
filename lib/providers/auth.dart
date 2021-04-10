@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:shop/exceptions/auth_exception.dart';
 
 class Auth with ChangeNotifier {
   // urlSegment é o que vai diferencial a URL para signInWithPassword (login) e signUp (cadastro)
@@ -17,7 +18,15 @@ class Auth with ChangeNotifier {
         "returnSecureToken": true,
       }),
     );
-    print(json.decode(response.body));
+
+    final responseBody = json.decode(response.body);
+    // response.body retorna um json que é convertido em um MAP <String, Object>
+    // sendo que a chave é 'error' e o valor é um outro MAP com o código do erro
+    // e a mensagem
+    if (responseBody['error'] != null) {
+      throw AuthException(responseBody['error']['message']);
+    }
+
     return Future.value();
   }
 
