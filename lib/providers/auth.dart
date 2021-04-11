@@ -5,6 +5,26 @@ import 'package:http/http.dart' as http;
 import 'package:shop/exceptions/auth_exception.dart';
 
 class Auth with ChangeNotifier {
+  DateTime _expiryDate;
+  String _token;
+
+  // Método que retorna o token caso este seja válido e esteja dentro do prazo
+  // de sua validade
+  String get token {
+    if (_token != null &&
+        _expiryDate != null &&
+        _expiryDate.isAfter(DateTime.now())) {
+      return _token;
+    } else {
+      return null;
+    }
+  }
+
+  bool get isAuth {
+    // Aqui estamos acssando o getter token e não a proriedade _token
+    return token != null;
+  }
+
   // urlSegment é o que vai diferencial a URL para signInWithPassword (login) e signUp (cadastro)
   Future<void> _authenticate(
       String email, String password, String urlSegment) async {
@@ -25,6 +45,17 @@ class Auth with ChangeNotifier {
     // e a mensagem
     if (responseBody['error'] != null) {
       throw AuthException(responseBody['error']['message']);
+    } else {
+      // Na resposta Firebase enviará um MAP com o idToken e o expriresIn (tempo em segundos
+      // para a validade do token)
+      _token = responseBody["idToken"];
+      // Adicionado a data atual o tempo de expiração, obtendo assim a data de expiração
+      _expiryDate = DateTime.now().add(
+        Duration(
+          seconds: int.parse(responseBody["expriresIn"]),
+        ),
+      );
+      notifyListeners();
     }
 
     return Future.value();
