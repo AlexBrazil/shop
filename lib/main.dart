@@ -65,7 +65,7 @@ class MyApp extends StatelessWidget {
         ),
         //home: ProductsOverviewScreen(), - estamos suando a tota abaixo
         routes: {
-          AppRoutes.AUTH_HOME: (ctx) => AutOrhHomeScreen(),
+          AppRoutes.AUTH_HOME: (ctx) => AuthOrHomeScreen(),
           AppRoutes.ORDERS: (ctx) => OrderScreen(),
           AppRoutes.PRODUCTS: (ctx) => ProductsScreen(),
           AppRoutes.PRODUCT_DETAIL: (ctx) => ProductDetailScreen(),
