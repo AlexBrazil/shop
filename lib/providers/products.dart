@@ -49,7 +49,7 @@ class Products with ChangeNotifier {
 
     // Vai esperar a resposta chegar para continuar
     final response = await http.post(
-      "$_baseUrl.json", // Parâmetro posicional
+      "$_baseUrl.json?auth=$_token", // Parâmetro posicional
       // Passamos um map para json.encode
       body: json.encode({
         // o ID não será passado
@@ -91,7 +91,7 @@ class Products with ChangeNotifier {
 
     if (index >= 0) {
       await http.patch(
-        "$_baseUrl/${product.id}.json",
+        "$_baseUrl/${product.id}.json?auth=$_token",
         body: json.encode({
           'title': product.title,
           'description': product.description,
@@ -109,7 +109,8 @@ class Products with ChangeNotifier {
     final index = _items.indexWhere((itemProduto) => itemProduto.id == id);
     if (index >= 0) {
       final product = _items[index];
-      final response = await http.delete("$_baseUrl/${product.id}.json");
+      final response =
+          await http.delete("$_baseUrl/${product.id}.json?auth=$_token");
 
       _items.remove(product);
       notifyListeners();
