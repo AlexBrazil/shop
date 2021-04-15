@@ -21,10 +21,28 @@ class MyApp extends StatelessWidget {
     // ChangeNotifierProvider é um Observador
     return MultiProvider(
       providers: [
+        // Existe uma hierarquia entre os Providers e por isso caso este seja usado abaixo
+        // deverá vir antes
         ChangeNotifierProvider(
-          // Products() deve ter um mixin de ChangeNotifier
+          // Auth() deve ter um mixin de ChangeNotifier
           // Criando o ChangeNotifierProvider
-          create: (ctx) => new Products(),
+          create: (ctx) => new Auth(),
+        ),
+        // Usamos ChangeNotifierProxyProvider para acessar dados de um provider
+        // dentro de outro provider
+        ChangeNotifierProxyProvider<Auth, Products>(
+          // Aqui usaremos o token que está em Auth e a lista de produtos
+          // que já está cadastrada (produtos na versão anterior antes de atualizar
+          // a lista de produtos)
+          // ----------------------------------------------------------------------
+          // Este provider não só usa somente o método create, mas também o Update, pois a cada
+          // chamada do backend temos que passar o token atualizado, sem perder a lista de produtos
+          // já cadastrada
+          create: (_) => new Products(null, []),
+          update: (ctx, auth, previousProducts) => new Products(
+            auth.token,
+            previousProducts.items,
+          ),
         ),
         ChangeNotifierProvider(
           // Cart() deve ter um mixin de ChangeNotifier
@@ -36,11 +54,6 @@ class MyApp extends StatelessWidget {
           // Criando o ChangeNotifierProvider
           create: (ctx) => new Orders(),
         ),
-        ChangeNotifierProvider(
-          // Auth() deve ter um mixin de ChangeNotifier
-          // Criando o ChangeNotifierProvider
-          create: (ctx) => new Auth(),
-        )
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

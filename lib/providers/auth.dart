@@ -40,6 +40,9 @@ class Auth with ChangeNotifier {
     );
 
     final responseBody = json.decode(response.body);
+
+    print(responseBody);
+
     // response.body retorna um json que é convertido em um MAP <String, Object>
     // sendo que a chave é 'error' e o valor é um outro MAP com o código do erro
     // e a mensagem
@@ -52,7 +55,7 @@ class Auth with ChangeNotifier {
       // Adicionado a data atual o tempo de expiração, obtendo assim a data de expiração
       _expiryDate = DateTime.now().add(
         Duration(
-          seconds: int.parse(responseBody["expriresIn"]),
+          seconds: int.parse(responseBody["expiresIn"]),
         ),
       );
       notifyListeners();

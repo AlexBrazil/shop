@@ -10,6 +10,13 @@ import 'product.dart';
 // todos os interessados. pode ser adicionar, excluir ou alterar algum produto
 class Products with ChangeNotifier {
   List<Product> _items = [];
+  String _token;
+
+  // Este toquem deverá ser passado na construção do objeto e vem de outro provider
+  // e por isso será usado, bem como passamos a lista atual de produtos para que não
+  // se perca a lista após cada update
+
+  Products(this._token, this._items);
 
   /*
      1) Aqui usa o alias criado - http. O objetivo é diferenciar o nome e ficar mais legível
@@ -132,7 +139,7 @@ class Products with ChangeNotifier {
   Future<void> loadproducts() async {
     // Se não usarmos await response NÃO recebe a resposta, mas sim um FUTURE, e
     // com isso NÃO teremos acesso ao .body
-    final reponse = await http.get("$_baseUrl.json");
+    final reponse = await http.get("$_baseUrl.json?auth=$_token");
     Map<String, dynamic> data = json.decode(reponse.body);
     //Limpa o MAP
     _items.clear();
