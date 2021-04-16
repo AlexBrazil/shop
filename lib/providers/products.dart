@@ -161,7 +161,7 @@ class Products with ChangeNotifier {
     return Future.value(); // Retorna um valor vazio
   }
 
-  Future<void> changeToggleFavorite(Product product) async {
+  Future<void> changeToggleFavorite(Product product, String token) async {
     if (product == null || product.id == null) {
       return Future.value();
     }
@@ -178,7 +178,7 @@ class Products with ChangeNotifier {
       notifyListeners();
 
       final response = await http.patch(
-        "$_baseUrl/${product.id}",
+        "$_baseUrl/${product.id}.json?auth=$token",
         body: json.encode({
           'isFavorite': product.isFavorite,
         }),

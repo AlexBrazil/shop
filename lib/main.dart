@@ -49,10 +49,19 @@ class MyApp extends StatelessWidget {
           // Criando o ChangeNotifierProvider
           create: (ctx) => new Cart(),
         ),
-        ChangeNotifierProvider(
-          // Orders() deve ter um mixin de ChangeNotifier
-          // Criando o ChangeNotifierProvider
-          create: (ctx) => new Orders(),
+        ChangeNotifierProxyProvider<Auth, Orders>(
+          // Aqui usaremos o token que está em Auth e a lista de produtos
+          // que já está cadastrada (produtos na versão anterior antes de atualizar
+          // a lista de produtos)
+          // ----------------------------------------------------------------------
+          // Este provider não só usa somente o método create, mas também o Update, pois a cada
+          // chamada do backend temos que passar o token atualizado, sem perder a lista de produtos
+          // já cadastrada
+          create: (_) => new Orders(null, []),
+          update: (ctx, auth, previousOrders) => new Orders(
+            auth.token,
+            previousOrders.items,
+          ),
         ),
       ],
       child: MaterialApp(

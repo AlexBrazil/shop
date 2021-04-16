@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shop/providers/auth.dart';
 import 'package:shop/providers/products.dart';
 import '../providers/product.dart';
 import '../providers/cart.dart';
@@ -13,8 +14,12 @@ class ProductGridItem extends StatelessWidget {
     final Product product = Provider.of<Product>(context, listen: false);
     // Usaremos aqui o 'listem false' por a UI não irá se alterar, apenas temos que
     // acionar algum método ao clicar no botão do carrinho
-    final Cart cart = Provider.of<Cart>(context, listen: false);
-    final products = Provider.of<Products>(context);
+    final Cart cart = Provider.of(context, listen: false);
+    final Auth auth = Provider.of<Auth>(context);
+    // Nesta definição de Provider, a título de estudo, não colocamos na definição o
+    // tipo Products (final Products products), por isso temos que definir o generics com
+    // Provider.of<Products>(context);
+    final products = Provider.of<Products>(context, listen: false);
 
     return ClipRRect(
       // Para definir uma borda arredondada
@@ -43,7 +48,7 @@ class ProductGridItem extends StatelessWidget {
               icon: Icon(
                   product.isFavorite ? Icons.favorite : Icons.favorite_border),
               onPressed: () {
-                products.changeToggleFavorite(product);
+                products.changeToggleFavorite(product, auth.token);
               },
               color: Theme.of(context).accentColor,
             ),

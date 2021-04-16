@@ -19,7 +19,7 @@ class AppDrawer extends StatelessWidget {
             onTap: () {
               // Não coloca em uma pilha de telas, a tela atual é
               // substituída
-              Navigator.of(context).pushReplacementNamed(AppRoutes.HOME);
+              Navigator.of(context).pushReplacementNamed(AppRoutes.AUTH_HOME);
             },
           ),
           Divider(),
