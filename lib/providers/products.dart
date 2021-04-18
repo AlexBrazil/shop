@@ -1,6 +1,10 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+/*
+O método .Put de http atualiza tudo
+o método .Patch de http atualiza parcial
+*/
 import 'package:http/http.dart' as http;
 import 'package:shop/exceptions/http_exception.dart';
 import 'package:shop/utils/constants.dart';
@@ -22,9 +26,12 @@ class Products with ChangeNotifier {
      1) Aqui usa o alias criado - http. O objetivo é diferenciar o nome e ficar mais legível
      2) products.json é usado no firebase, em uma API Rest comum usaria apenas products
     */
-  final String _baseUrl =
+  final String _baseUrlProducts =
       // Se quisermos simular um erro no Firebase retiramos .json
       '${Constants.BASE_API_URL}/products';
+  final String _baseUrlUserFavorites =
+      // Se quisermos simular um erro no Firebase retiramos .json
+      '${Constants.BASE_API_URL}/userFavorites';
 
   /* Getters retorna uma cópia da lista de produtos, pois se passarmos uma
    referência de _item, qualquer um terá a possibilidade de alterar a
@@ -49,7 +56,7 @@ class Products with ChangeNotifier {
 
     // Vai esperar a resposta chegar para continuar
     final response = await http.post(
-      "$_baseUrl.json?auth=$_token", // Parâmetro posicional
+      "$_baseUrlProducts.json?auth=$_token", // Parâmetro posicional
       // Passamos um map para json.encode
       body: json.encode({
         // o ID não será passado
@@ -57,7 +64,6 @@ class Products with ChangeNotifier {
         'description': newProduct.description,
         'price': newProduct.price,
         'imageUrl': newProduct.imageUrl,
-        'isFavorite': newProduct.isFavorite,
       }),
     );
     // em response terei o json com a estrutura de dados cadastrada, inclusive
@@ -91,7 +97,7 @@ class Products with ChangeNotifier {
 
     if (index >= 0) {
       await http.patch(
-        "$_baseUrl/${product.id}.json?auth=$_token",
+        "$_baseUrlProducts/${product.id}.json?auth=$_token",
         body: json.encode({
           'title': product.title,
           'description': product.description,
@@ -109,8 +115,8 @@ class Products with ChangeNotifier {
     final index = _items.indexWhere((itemProduto) => itemProduto.id == id);
     if (index >= 0) {
       final product = _items[index];
-      final response =
-          await http.delete("$_baseUrl/${product.id}.json?auth=$_token");
+      final response = await http
+          .delete("$_baseUrlProducts/${product.id}.json?auth=$_token");
 
       _items.remove(product);
       notifyListeners();
@@ -140,7 +146,7 @@ class Products with ChangeNotifier {
   Future<void> loadproducts() async {
     // Se não usarmos await response NÃO recebe a resposta, mas sim um FUTURE, e
     // com isso NÃO teremos acesso ao .body
-    final reponse = await http.get("$_baseUrl.json?auth=$_token");
+    final reponse = await http.get("$_baseUrlProducts.json?auth=$_token");
     Map<String, dynamic> data = json.decode(reponse.body);
     //Limpa o MAP
     _items.clear();
@@ -161,7 +167,8 @@ class Products with ChangeNotifier {
     return Future.value(); // Retorna um valor vazio
   }
 
-  Future<void> changeToggleFavorite(Product product, String token) async {
+  Future<void> changeToggleFavorite(
+      {Product product, String token, String userId}) async {
     if (product == null || product.id == null) {
       return Future.value();
     }
@@ -177,11 +184,13 @@ class Products with ChangeNotifier {
       _items[index].isFavorite = product.isFavorite;
       notifyListeners();
 
-      final response = await http.patch(
-        "$_baseUrl/${product.id}.json?auth=$token",
-        body: json.encode({
-          'isFavorite': product.isFavorite,
-        }),
+      final response = await http.put(
+        "$_baseUrlUserFavorites/$userId/${product.id}.json?auth=$token",
+        // Aqui não usa um campo, algo tipo 'isFavorite' : isFavorite para
+        // registrar no FIREBASE, registra boleano direto no ID do produto
+        body: json.encode(
+          product.isFavorite,
+        ),
       );
 
       if (response.statusCode >= 400) {
