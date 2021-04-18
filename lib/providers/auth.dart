@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -8,6 +9,7 @@ class Auth with ChangeNotifier {
   String _userId;
   DateTime _expiryDate;
   String _token;
+  Timer _logoutTimer;
 
   // Método que retorna o token caso este seja válido e esteja dentro do prazo
   // de sua validade
@@ -62,6 +64,8 @@ class Auth with ChangeNotifier {
           seconds: int.parse(responseBody["expiresIn"]),
         ),
       );
+      // Este método cria um cronômetro de começa a contar o tempo para deslogar
+      _autoLogout();
       notifyListeners();
     }
 
@@ -80,6 +84,19 @@ class Auth with ChangeNotifier {
     _token = null;
     _userId = null;
     _expiryDate = null;
+    if (_logoutTimer != null) {
+      _logoutTimer.cancel();
+      _logoutTimer = null;
+    }
     notifyListeners();
+  }
+
+  void _autoLogout() {
+    if (_logoutTimer != null) {
+      _logoutTimer.cancel();
+    }
+    // calcula o tempo que falra para expirar o token
+    final timeToLogout = _expiryDate.difference(DateTime.now()).inSeconds;
+    _logoutTimer = Timer(Duration(seconds: timeToLogout), logout);
   }
 }
