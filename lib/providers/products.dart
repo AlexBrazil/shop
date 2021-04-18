@@ -15,12 +15,16 @@ import 'product.dart';
 class Products with ChangeNotifier {
   List<Product> _items = [];
   String _token;
+  String _userId;
 
-  // Este toquem deverá ser passado na construção do objeto e vem de outro provider
-  // e por isso será usado, bem como passamos a lista atual de produtos para que não
-  // se perca a lista após cada update
+  // * Este token deverá ser passado na construção do objeto e vem de outro provider
+  //   e por isso será usado, bem como passamos a lista atual de produtos para que não
+  //   se perca a lista após cada update.
+  // * Os parâmetros serão opcionais para que no provider possamos ter mais liberdade
+  //   na hora de usar update e create, onde no create usamos o construtor sem parãmetros
+  //   e no update com parâmetros
 
-  Products(this._token, this._items);
+  Products([this._token, this._userId, this._items = const []]);
 
   /*
      1) Aqui usa o alias criado - http. O objetivo é diferenciar o nome e ficar mais legível
@@ -148,17 +152,33 @@ class Products with ChangeNotifier {
     // com isso NÃO teremos acesso ao .body
     final reponse = await http.get("$_baseUrlProducts.json?auth=$_token");
     Map<String, dynamic> data = json.decode(reponse.body);
+
+    // Aqui pegamos a favoritação de produtos por usuário
+    final favReponse = await http.get(
+        "${Constants.BASE_API_URL}/userFavorites/$_userId.json?auth=$_token");
+    final favMap = json.decode(favReponse.body);
+    print("FAV MAP: $favMap");
+
     //Limpa o MAP
     _items.clear();
     if (data != null) {
       data.forEach((productID, productData) {
+        /* Recuperando a favoritação do produto
+        SE NO FIREBASE SE APAGAR A COLEÇÃO OU ALGUM CAMPO DA COLEÇÃO:
+        Se o map for nulo é falso, caso o map não for nulo é pq existe um Id para o
+        produto e recuperamos o valor de favorito para aquele produto, mas pode ser 
+        tenham apagado o produto, por isso temos "?? false", ou seja, é um valor
+        padrão.
+        */
+        final isFavorite = favMap == null ? false : favMap[productID] ?? false;
         _items.add(Product(
-            id: productID,
-            title: productData['title'],
-            description: productData['description'],
-            price: productData['price'],
-            imageUrl: productData['imageUrl'],
-            isFavorite: productData['isFavorite']));
+          id: productID,
+          title: productData['title'],
+          description: productData['description'],
+          price: productData['price'],
+          imageUrl: productData['imageUrl'],
+          isFavorite: isFavorite,
+        ));
       });
       notifyListeners();
     }

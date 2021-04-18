@@ -38,9 +38,10 @@ class MyApp extends StatelessWidget {
           // Este provider não só usa somente o método create, mas também o Update, pois a cada
           // chamada do backend temos que passar o token atualizado, sem perder a lista de produtos
           // já cadastrada
-          create: (_) => new Products(null, []),
+          create: (_) => new Products(),
           update: (ctx, auth, previousProducts) => new Products(
             auth.token,
+            auth.userId,
             previousProducts.items,
           ),
         ),
@@ -57,7 +58,7 @@ class MyApp extends StatelessWidget {
           // Este provider não só usa somente o método create, mas também o Update, pois a cada
           // chamada do backend temos que passar o token atualizado, sem perder a lista de produtos
           // já cadastrada
-          create: (_) => new Orders(null, []),
+          create: (_) => new Orders(),
           update: (ctx, auth, previousOrders) => new Orders(
             auth.token,
             previousOrders.items,

@@ -32,7 +32,7 @@ class Orders with ChangeNotifier {
       '${Constants.BASE_API_URL}/orders';
 
   // Construtor
-  Orders(this._token, this._items);
+  Orders([this._token, this._items = const []]);
 
   int get itemsCount {
     return _items.length;
