@@ -20,6 +20,7 @@ class Order {
 
 class Orders with ChangeNotifier {
   String _token;
+  String _userId;
   List<Order> _items = [];
 
   List<Order> get items {
@@ -32,7 +33,7 @@ class Orders with ChangeNotifier {
       '${Constants.BASE_API_URL}/orders';
 
   // Construtor
-  Orders([this._token, this._items = const []]);
+  Orders([this._token, this._userId, this._items = const []]);
 
   int get itemsCount {
     return _items.length;
@@ -41,7 +42,7 @@ class Orders with ChangeNotifier {
   Future<void> addOrder(Cart cart) async {
     final date = DateTime.now();
     final response = await http.post(
-      "$_baseUrl.json?auth=$_token",
+      "$_baseUrl/$_userId.json?auth=$_token",
       body: json.encode({
         'total': cart.totalAmount,
         // Convert no formato ISO-8601 para armazenamento
@@ -84,7 +85,7 @@ class Orders with ChangeNotifier {
     List<Order> loadedItems = [];
     // Se não usarmos await response NÃO recebe a resposta, mas sim um FUTURE, e
     // com isso NÃO teremos acesso ao .body
-    final reponse = await http.get("$_baseUrl.json?auth=$_token");
+    final reponse = await http.get("$_baseUrl/$_userId.json?auth=$_token");
     Map<String, dynamic> data = json.decode(reponse.body);
     //Limpa o MAP
 
