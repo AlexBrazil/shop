@@ -10,7 +10,20 @@ class AuthOrHomeScreen extends StatelessWidget {
     // Como o provider Auth tem o listen como true, quando este atributo alterar
     // a tela é renderizada novamente
     Auth auth = Provider.of(context);
-    print(auth.isAuth);
-    return auth.isAuth ? ProductsOverviewScreen() : AuthScreen();
+    return FutureBuilder(
+      future: auth.tryAutoLogin(),
+      builder: (ctx, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        } else if (snapshot.error != null) {
+          //print("Ocorreu um erro: ${snapshot.error}");
+          return Center(
+            child: Text('Ocorreu um erro!'),
+          );
+        } else {
+          return auth.isAuth ? ProductsOverviewScreen() : AuthScreen();
+        }
+      },
+    );
   }
 }

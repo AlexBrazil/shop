@@ -29,6 +29,10 @@ class OrderScreen extends StatelessWidget {
             // estará no estado de waiting
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Center(child: CircularProgressIndicator());
+            } else if (snapshot.error != null) {
+              return Center(
+                child: Text('Ocorreu um erro!'),
+              );
             } else {
               // RefreshIndicator atualiza a tela caso arrastada para baixo
               return RefreshIndicator(
