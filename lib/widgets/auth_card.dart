@@ -14,7 +14,8 @@ class AuthCard extends StatefulWidget {
   _AuthCardState createState() => _AuthCardState();
 }
 
-class _AuthCardState extends State<AuthCard> {
+class _AuthCardState extends State<AuthCard>
+    with SingleTickerProviderStateMixin {
   // Para o formulário
   GlobalKey<FormState> _form = GlobalKey();
 
@@ -24,9 +25,55 @@ class _AuthCardState extends State<AuthCard> {
   final _passwordController = TextEditingController();
   AuthMode _authMode = AuthMode.Login;
   bool _isLoading = false;
-
   // Variável usada para mostrar ou ocultar os caracteres da senha
   bool _isObscure = true;
+
+  // Criando animação
+  AnimationController _controller;
+  Animation<Size> _heigthAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      /* vsync usa uma classe do tipo TickerProvider - este provider é chamado
+      toda vez que houver uma atualização de quadro, em torno de 60 X por minuto
+      Com ele fazemos a sincronia da animação
+      Para tornar uma classe do tipo TickerProvider usamos um mixin:
+      SingleTickerProviderStateMixin (single pq é uma única animação)
+      */
+      // Usamos this pro a classe tem mixin de SingleTickerProviderStateMixin
+      vsync: this,
+      duration: Duration(
+        // Se em 1 seg tem 60 quados - (60 * 300) / 1000 = 18 quadros
+        milliseconds: 300,
+      ),
+    );
+    // Após inicializado o controle devemos inicializar a animação
+    _heigthAnimation = Tween(
+      begin: Size(double.infinity, 290),
+      end: Size(double.infinity, 371),
+    ).animate(
+      CurvedAnimation(
+        parent: _controller,
+        // Velocidade constante do começo ao final - linear
+        curve: Curves.linear,
+      ),
+    );
+    _heigthAnimation.addListener(() {
+      setState(() {
+        // Não precisa fazer nada aqui, é só para adicionar um Listener que
+        // escuta a mudança de _heigthAnimation e chama SetState
+      });
+    });
+  }
+
+  //Como criamos manualmente a animação, é bom chamar dispose
+  @override
+  void dispose() {
+    super.dispose();
+    _controller.dispose();
+  }
 
   void _showErrorDialog(String msg) {
     showDialog(
@@ -91,10 +138,14 @@ class _AuthCardState extends State<AuthCard> {
       setState(() {
         _authMode = AuthMode.Signup;
       });
+      // Toca a animação para a frente
+      _controller.forward();
     } else {
       setState(() {
         _authMode = AuthMode.Login;
       });
+      // Toca a animação para trás
+      _controller.reverse();
     }
 
     setState(() {
@@ -127,7 +178,8 @@ class _AuthCardState extends State<AuthCard> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
       child: Container(
         width: deviceSize.width * 0.75,
-        height: _authMode == AuthMode.Login ? 290 : 371,
+        //height: _authMode == AuthMode.Login ? 290 : 371,
+        height: _heigthAnimation.value.height,
         padding: EdgeInsets.all(16.0),
         child: Form(
           // Com essa key consigo controlar todas as validações deste Form
