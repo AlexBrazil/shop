@@ -176,10 +176,12 @@ class _AuthCardState extends State<AuthCard>
     return Card(
       elevation: 8.0,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
-      child: Container(
+      child: AnimatedContainer(
+        duration: Duration(milliseconds: 300),
+        curve: Curves.easeIn,
         width: deviceSize.width * 0.75,
-        //height: _authMode == AuthMode.Login ? 290 : 371,
-        height: _heigthAnimation.value.height,
+        height: _authMode == AuthMode.Login ? 290 : 371,
+        //height: _heigthAnimation.value.height,
         padding: EdgeInsets.all(16.0),
         child: Form(
           // Com essa key consigo controlar todas as validações deste Form
