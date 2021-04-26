@@ -30,7 +30,8 @@ class _AuthCardState extends State<AuthCard>
 
   // Criando animação
   AnimationController _controller;
-  Animation<Size> _heigthAnimation;
+  Animation<double> _opacityAnimation;
+  Animation<Offset> _slideAnimation;
 
   @override
   void initState() {
@@ -50,9 +51,9 @@ class _AuthCardState extends State<AuthCard>
       ),
     );
     // Após inicializado o controle devemos inicializar a animação
-    _heigthAnimation = Tween(
-      begin: Size(double.infinity, 290),
-      end: Size(double.infinity, 371),
+    _opacityAnimation = Tween(
+      begin: 0.0,
+      end: 1.0,
     ).animate(
       CurvedAnimation(
         parent: _controller,
@@ -60,12 +61,27 @@ class _AuthCardState extends State<AuthCard>
         curve: Curves.linear,
       ),
     );
-    _heigthAnimation.addListener(() {
+
+    _slideAnimation = Tween<Offset>(
+      begin: Offset(0, -1.5),
+      end: Offset(0, 0),
+    ).animate(
+      CurvedAnimation(
+        parent: _controller,
+        // Velocidade constante do começo ao final - linear
+        curve: Curves.linear,
+      ),
+    );
+
+    /*
+    Como usamos AnimatedContainer isso não é necessário
+    _opacityAnimation.addListener(() {
       setState(() {
         // Não precisa fazer nada aqui, é só para adicionar um Listener que
         // escuta a mudança de _heigthAnimation e chama SetState
       });
     });
+    */
   }
 
   //Como criamos manualmente a animação, é bom chamar dispose
@@ -224,22 +240,40 @@ class _AuthCardState extends State<AuthCard>
                 },
                 onSaved: (value) => _authData['password'] = value,
               ),
-              if (_authMode == AuthMode.Signup)
-                TextFormField(
-                  //controller: _passwordController,
-                  decoration: InputDecoration(
-                    labelText: 'Confirmar Senha',
-                  ),
-                  obscureText: _isObscure,
-                  validator: _authMode == AuthMode.Signup
-                      ? (value) {
-                          if (value != _passwordController.text) {
-                            return 'A senha de confirmação está diferente';
-                          }
-                          return null;
-                        }
-                      : null,
+              AnimatedContainer(
+                // Algo tem que alterar de valor para que AnimatedContainer detecte
+                // e anime, vamos então usar constraints, zarando quando em Login e
+                // colocando o tamanho total quando em Cadastro
+                constraints: BoxConstraints(
+                  //BoxConstraints muda a altura de forma abrupta, mas AnimatedContainer
+                  //fara a animação desta mudança
+                  minHeight: _authMode == AuthMode.Signup ? 60 : 0,
+                  maxHeight: _authMode == AuthMode.Signup ? 120 : 0,
                 ),
+                duration: Duration(milliseconds: 300),
+                curve: Curves.linear,
+                child: FadeTransition(
+                  opacity: _opacityAnimation,
+                  child: SlideTransition(
+                    position: _slideAnimation,
+                    child: TextFormField(
+                      //controller: _passwordController,
+                      decoration: InputDecoration(
+                        labelText: 'Confirmar Senha',
+                      ),
+                      obscureText: _isObscure,
+                      validator: _authMode == AuthMode.Signup
+                          ? (value) {
+                              if (value != _passwordController.text) {
+                                return 'A senha de confirmação está diferente';
+                              }
+                              return null;
+                            }
+                          : null,
+                    ),
+                  ),
+                ),
+              ),
               Spacer(),
               if (_isLoading)
                 CircularProgressIndicator()
