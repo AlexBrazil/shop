@@ -21,44 +21,54 @@ class AuthScreen extends StatelessWidget {
               ),
             ),
           ),
-          Container(
-            width: double.infinity,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Container(
-                  margin: EdgeInsets.only(bottom: 20.0),
-                  // Operador cascade ..
-                  // Usado aqui pois 'transform' exige um retorno do tipo
-                  // 'Matrix4' e 'translate' retorna 'void'. Com '..' o método
-                  // é apenas executado, mas o retorno é dado por
-                  // Matrix4.rotationZ(-8 * pi / 180)
-                  transform: Matrix4.rotationZ(-8 * pi / 180)..translate(-10.0),
-                  padding: EdgeInsets.symmetric(
-                    vertical: 8,
-                    horizontal: 70,
-                  ),
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(15),
-                      color: Colors.deepOrange.shade900,
-                      boxShadow: [
-                        BoxShadow(
-                            blurRadius: 8.0,
-                            color: Colors.black26,
-                            offset: Offset(0, 2))
-                      ]),
-                  child: Text(
-                    'Minha Loja',
-                    style: TextStyle(
-                        color:
-                            Theme.of(context).accentTextTheme.headline6.color,
-                        fontSize: 45,
-                        fontFamily: 'Anton'),
-                  ),
+          Center(
+            child: SingleChildScrollView(
+              child: Container(
+                width: double.infinity,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                      height: 43,
+                    ),
+                    Container(
+                      margin: EdgeInsets.only(bottom: 20.0),
+                      // Operador cascade ..
+                      // Usado aqui pois 'transform' exige um retorno do tipo
+                      // 'Matrix4' e 'translate' retorna 'void'. Com '..' o método
+                      // é apenas executado, mas o retorno é dado por
+                      // Matrix4.rotationZ(-8 * pi / 180)
+                      transform: Matrix4.rotationZ(-8 * pi / 180)
+                        ..translate(-10.0),
+                      padding: EdgeInsets.symmetric(
+                        vertical: 8,
+                        horizontal: 70,
+                      ),
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(15),
+                          color: Colors.deepOrange.shade900,
+                          boxShadow: [
+                            BoxShadow(
+                                blurRadius: 8.0,
+                                color: Colors.black26,
+                                offset: Offset(0, 2))
+                          ]),
+                      child: Text(
+                        'Minha Loja',
+                        style: TextStyle(
+                            color: Theme.of(context)
+                                .accentTextTheme
+                                .headline6
+                                .color,
+                            fontSize: 45,
+                            fontFamily: 'Anton'),
+                      ),
+                    ),
+                    AuthCard(),
+                  ],
                 ),
-                AuthCard(),
-              ],
+              ),
             ),
           )
         ],

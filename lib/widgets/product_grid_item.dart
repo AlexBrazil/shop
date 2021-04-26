@@ -32,9 +32,9 @@ class ProductGridItem extends StatelessWidget {
               arguments: product,
             );
           },
-          child: Image.network(
-            product.imageUrl,
-            // Forma de preenchimento da imagem
+          child: FadeInImage(
+            placeholder: AssetImage('assets/images/productplaceholder.png'),
+            image: NetworkImage(product.imageUrl),
             fit: BoxFit.cover,
           ),
         ),
