@@ -32,10 +32,15 @@ class ProductGridItem extends StatelessWidget {
               arguments: product,
             );
           },
-          child: FadeInImage(
-            placeholder: AssetImage('assets/images/productplaceholder.png'),
-            image: NetworkImage(product.imageUrl),
-            fit: BoxFit.cover,
+          // Animação Hero liga dois objetos em tela por meio da tag, que
+          // tem que ser igual nas duas telas e único para o Hero
+          child: Hero(
+            tag: product.id,
+            child: FadeInImage(
+              placeholder: AssetImage('assets/images/productplaceholder.png'),
+              image: NetworkImage(product.imageUrl),
+              fit: BoxFit.cover,
+            ),
           ),
         ),
         // Parte inferior de cada tijolo
