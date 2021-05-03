@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shop/providers/auth.dart';
+import 'package:shop/utils/custom_route.dart';
+import 'package:shop/views/order_secreen.dart';
 import '../utils/app_routes.dart';
 
 class AppDrawer extends StatelessWidget {
@@ -31,7 +33,9 @@ class AppDrawer extends StatelessWidget {
             onTap: () {
               // Não coloca em uma pilha de telas, a tela atual é
               // substituída
-              Navigator.of(context).pushReplacementNamed(AppRoutes.ORDERS);
+              //Navigator.of(context).pushReplacementNamed(AppRoutes.ORDERS);
+              Navigator.of(context).pushReplacement(
+                  CustomRoute(builder: (ctx) => OrderScreen()));
             },
           ),
           Divider(),
